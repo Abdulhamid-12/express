@@ -1,19 +1,15 @@
 import express from "express";
-import ServerlessHttp from "serverless-http";
+import serverless from "serverless-http";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// const port = process.env.PORT || 8000;
-const handler = ServerlessHttp(app);
-const API = ".netlify/functions/api";
-module.exports.handler = async (event, context) => {
-  return handler(event, context);
-};
-
 const app = express();
+
+const API = "/.netlify/functions/api";
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res) => {
@@ -60,11 +56,14 @@ const calculate = (req, res) => {
   }
 };
 
-app.get(`/${API}/:operation/:a/:b`, calculate);
-app.post(`/${API}/:operation/:a/:b`, calculate);
+app.all(`${API}/:operation/:a/:b`, (req, res, next) => {
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+  next();
+});
 
-// app.listen(port, () => console.log(`Server listening on port ${port}!`));
+app.get(`${API}/:operation/:a/:b`, calculate);
+app.post(`${API}/:operation/:a/:b`, calculate);
 
-// •	You should handle at least the following errors with appropriate responses:
-// o	Division by zero.
-// o	Using non-supported HTTP methods.
+export const handler = serverless(app);
