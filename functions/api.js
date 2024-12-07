@@ -1,11 +1,17 @@
 import express from "express";
+import ServerlessHttp from "serverless-http";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const port = process.env.PORT || 8000;
+// const port = process.env.PORT || 8000;
+const handler = ServerlessHttp(app);
+
+module.exports.handler = async (event, context) => {
+  return handler(event, context);
+};
 
 const app = express();
 app.use(express.static(path.join(__dirname, "public")));
@@ -57,7 +63,7 @@ const calculate = (req, res) => {
 app.get("/api/:operation/:a/:b", calculate);
 app.post("/api/:operation/:a/:b", calculate);
 
-app.listen(port, () => console.log(`Server listening on port ${port}!`));
+// app.listen(port, () => console.log(`Server listening on port ${port}!`));
 
 // •	You should handle at least the following errors with appropriate responses:
 // o	Division by zero.
