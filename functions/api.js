@@ -1,24 +1,40 @@
 import express from "express";
-import serverless from "serverless-http";
-import path from "path";
-import { fileURLToPath } from "url";
+import serverlessHttp from "serverless-http";
+// import path from "path";
+// import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const app = express();
-
 const API = "/.netlify/functions/api";
 
-app.use(express.static(path.join(__dirname, "public")));
+// app.get(API, (req, res) => {
+//   return res.json({
+//     message: "Hello World",
+//   });
+// });
 
-app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
-});
+const handler = serverlessHttp(app);
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+module.exports.handler = async (event, context) => {
+  const result = await handler(event, context);
+  return result;
+};
+
+// app.get("/.netlify/functions/api/:operation/:a/:b/", calculate);
+
+// const API = "/.netlify/functions/api";
+
+// app.use(express.static(path.join(__dirname, "../../public")));
+
+// app.use((req, res) => {
+//   res.status(404).sendFile(path.join(__dirname, "../../public", "404.html"));
+// });
+
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../../public", "index.html"));
+// });
 
 const calculate = (req, res) => {
   const op = req.params.operation;
@@ -38,7 +54,6 @@ const calculate = (req, res) => {
       result = a - b;
       res.status(200).json({ operation: op, result: result, inputs: [a, b] });
       break;
-
     case "multiply":
       result = a * b;
       res.status(200).json({ operation: op, result: result, inputs: [a, b] });
@@ -56,14 +71,5 @@ const calculate = (req, res) => {
   }
 };
 
-app.all(`${API}/:operation/:a/:b`, (req, res, next) => {
-  if (req.method !== "GET" && req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-  next();
-});
-
 app.get(`${API}/:operation/:a/:b`, calculate);
 app.post(`${API}/:operation/:a/:b`, calculate);
-
-export const handler = serverless(app);

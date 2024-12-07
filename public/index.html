@@ -153,10 +153,10 @@
           alert("Please enter valid numbers.");
           return;
         }
-        const API = ".netlify/functions/api";
+        const API = "/.netlify/functions/api";
 
         const response = await fetch(
-          `/${API}/${operation}/${number1}/${number2}`
+          `${API}/${operation}/${number1}/${number2}`
         );
         const data = await response.json();
         if (data.error) {
