@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // const port = process.env.PORT || 8000;
 const handler = ServerlessHttp(app);
-
+const API = ".netlify/functions/api";
 module.exports.handler = async (event, context) => {
   return handler(event, context);
 };
@@ -60,8 +60,8 @@ const calculate = (req, res) => {
   }
 };
 
-app.get("/api/:operation/:a/:b", calculate);
-app.post("/api/:operation/:a/:b", calculate);
+app.get(`/${API}/:operation/:a/:b`, calculate);
+app.post(`/${API}/:operation/:a/:b`, calculate);
 
 // app.listen(port, () => console.log(`Server listening on port ${port}!`));
 
