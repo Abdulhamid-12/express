@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+
+      .calculator {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .calculator h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      .calculator label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+      }
+
+      .calculator input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .calculator button {
+        width: 100%;
+        padding: 10px;
+        margin: 2%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .calculator button:hover {
+        border: 3px solid black !important;
+      }
+
+      .result {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        color: #333;
+        background-color: rgb(198, 192, 192);
+        padding: 5px;
+        border-radius: 4px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 500px;
+      }
+
+      .btn_group {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .error {
+        color: red;
+        background-color: rgb(230, 171, 171);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <h1>Calculator</h1>
+      <form id="calculator-form">
+        <input
+          type="number"
+          id="number1"
+          name="number1"
+          required
+          placeholder="Enter first number"
+        />
+        <input
+          type="number"
+          id="number2"
+          name="number2"
+          required
+          placeholder="Enter second number"
+        />
+        <div class="btn_group">
+          <button
+            style="
+              background-color: rgb(0, 123, 255);
+              border: 3px solid rgb(0, 123, 255);
+            "
+            type="button"
+            onclick="calculate('add')"
+          >
+            Add
+          </button>
+          <button
+            style="background-color: green; border: 3px solid green"
+            type="button"
+            onclick="calculate('subtract')"
+          >
+            Subtract
+          </button>
+        </div>
+        <div class="btn_group">
+          <button
+            style="background-color: purple; border: 3px solid purple"
+            type="button"
+            onclick="calculate('multiply')"
+          >
+            Multiply
+          </button>
+          <button
+            style="background-color: orange; border: 3px solid orange"
+            type="button"
+            onclick="calculate('divide')"
+          >
+            Divide
+          </button>
+        </div>
+      </form>
+      <div class="result"><span id="result">Result: </span></div>
+    </div>
+
+    <script>
+      async function calculate(operation) {
+        const number1 = parseFloat(document.getElementById("number1").value);
+        const number2 = parseFloat(document.getElementById("number2").value);
+        let result;
+
+        if (isNaN(number1) || isNaN(number2)) {
+          alert("Please enter valid numbers.");
+          return;
+        }
+
+        const response = await fetch(
+          "/api/" + operation + "/" + number1 + "/" + number2
+        );
+        const data = await response.json();
+        if (data.error) {
+          document.getElementsByClassName("result")[0].classList.add("error");
+          document.getElementById("result").innerText = data.error;
+        } else {
+          result = data.result;
+          const errorClass = document.getElementsByClassName("result")[0];
+          if (errorClass) {
+            errorClass.classList.remove("error");
+          }
+          document.getElementById("result").innerText = "Result: " + result;
+        }
+      }
+    </script>
+  </body>
+</html>
